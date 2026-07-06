@@ -180,6 +180,13 @@ jobs:
           "${{ steps.conda.outputs.PREFIX }}/bin/conda" config --add channels defaults
           "${{ steps.conda.outputs.PREFIX }}/bin/conda" config --add channels conda-forge
           "${{ steps.conda.outputs.PREFIX }}/bin/conda" config --add channels hep-forge
+          # geant (the eic/geant4 eAST-physics-list fork) is published
+          # under the "eic" label, not "main" -- dd4hep pulls it in as a
+          # transitive run dependency, so the solver needs this channel
+          # too. Only added here (not the shared
+          # scripts/templates/autoupload.yml) since most feedstocks
+          # don't need it.
+          "${{ steps.conda.outputs.PREFIX }}/bin/conda" config --add channels hep-forge/label/eic
 
       - name: Build Package
         env:

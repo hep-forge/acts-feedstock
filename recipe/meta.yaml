@@ -1,5 +1,5 @@
 {% set versions = {
-    "0.0.0": "REPLACE_WITH_SHA256"
+    "46.8.1": "2453606e7dbc6188e94566ff43922ee982bf82dddbe33be7b4d8b2233a5509e0"
 } %}
 
 {% set version = environ.get('COMMIT_VERSION', None) %}
@@ -7,19 +7,22 @@
 {% set version = version|string %}
 
 {% set name = environ.get('ANACONDA_PACKAGE', 'acts')|string|lower %}
+{% set root_tag = (root or '')|replace('.', '') %}
 
 package:
   name: {{ name }}
   version: {{ environ.get('ANACONDA_VERSION', version)|replace("-", ".") }}
 
 source:
-  url: "https://github.com/acts-project/acts/archive/refs/tags/{{ version }}.tar.gz"   # TODO: confirm upstream's actual tag/tarball naming
+  url: "https://github.com/acts-project/acts/archive/refs/tags/v{{ version }}.tar.gz"
   {% if versions.get(version, None) %}
   sha256: {{ versions.get(version) }}
   {% endif %}
 
 build:
   number: 0
+  string: "root{{ root_tag }}"
+  skip: true  # [win]
   run_exports:
     - {{ pin_subpackage(name, max_pin="x.x.x") }}
 
@@ -30,19 +33,52 @@ requirements:
     - {{ stdlib('c') }}
     - cmake
     - make
+    # Python is needed for codegen (material composition tables etc, see
+    # acts's codegen/README.md) and Fatras's particle-data-table
+    # generator -- NOT used by the library build itself, so pin a
+    # single version rather than pulling in conda-forge's full matrix.
+    - python 3.12.*
+    - hatchling
+    - numpy
+    - sympy
+    - particle
   host:
-    # TODO: library dependencies
+    # geant is published only under the hep-forge "eic" label -- this
+    # feedstock's own .github/workflows/autoupload.yml adds that
+    # channel (scripts/templates/autoupload.yml deliberately does not,
+    # most feedstocks don't need it) -- dd4hep pulls geant in
+    # transitively.
+    - libboost-devel
+    - eigen
+    - root {{ root }}.*
+    - dd4hep>=1.11 root{{ root_tag }}
+    - nlohmann_json
   run:
-    # TODO: runtime dependencies
+    - root {{ root }}.*
+    - dd4hep>=1.11 root{{ root_tag }}
+    - nlohmann_json
 
 test:
   commands:
-    - echo "TODO: a real smoke test"
+    - test -f "${PREFIX}/lib/cmake/Acts/ActsConfig.cmake"
+    - test -f "${PREFIX}/lib/libActsCore.so"
+    - test -f "${PREFIX}/lib/libActsPluginDD4hep.so"
+    - test -f "${PREFIX}/lib/libActsPluginJson.so"
 
 about:
-  home: "https://github.com/acts-project/acts"
+  home: "https://acts.readthedocs.io/"
+  dev_url: "https://github.com/acts-project/acts"
   license: "MPL-2.0"
+  license_file: LICENSE
   summary: "Experiment-independent toolkit for particle track reconstruction"
+  description: |
+    ACTS is an experiment-independent toolkit for (charged) particle
+    track reconstruction in (high energy) physics experiments,
+    implemented in modern C++. Built here with the DD4hep, Root, and
+    Json plugins enabled (against hep-forge's own dd4hep/root) so that
+    an epic-built detector geometry can be converted into an ACTS
+    tracking geometry -- part of hep-forge's EIC Phase 1 build-out
+    (geant -> g4hepem -> dd4hep -> epic -> npsim, plus acts).
 
 extra:
   recipe-maintainers:
