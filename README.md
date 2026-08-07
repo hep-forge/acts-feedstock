@@ -13,12 +13,7 @@ Experiment-independent toolkit for particle track reconstruction
 
 ## Architectures
 
-| Architecture | Latest published |
-|--------------|------------------|
-| linux-amd64 (`linux-64`) | ✅ `46.8.1` |
-| linux-arm64 (`linux-aarch64`) | ✅ `46.8.1` |
-
-_As of the last feedstock render; the badges above are live._
+State per architecture: see the platforms badge above or [anaconda.org/hep-forge/acts](https://anaconda.org/hep-forge/acts).
 
 
 ## Install
