@@ -67,10 +67,9 @@ requirements:
 test:
   commands:
     - test -f "${PREFIX}/lib/cmake/Acts/ActsConfig.cmake"
-    - test -f "${PREFIX}/lib/libActsCore.so"
-    - test -f "${PREFIX}/lib/libActsPluginDD4hep.so"
-    - test -f "${PREFIX}/lib/libActsPluginJson.so"
-
+    - test -f "${PREFIX}/lib/libActsCore.so" || test -f "${PREFIX}/lib/libActsCore.dylib"
+    - test -f "${PREFIX}/lib/libActsPluginDD4hep.so" || test -f "${PREFIX}/lib/libActsPluginDD4hep.dylib"
+    - test -f "${PREFIX}/lib/libActsPluginJson.so" || test -f "${PREFIX}/lib/libActsPluginJson.dylib"
 about:
   home: "https://acts.readthedocs.io/"
   dev_url: "https://github.com/acts-project/acts"
