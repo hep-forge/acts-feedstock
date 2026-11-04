@@ -11,6 +11,9 @@ cd build
 # (2.2.5 < 2.9.0) even with CMAKE_PREFIX_PATH; name conda's expat directly.
 EXTRA_ARGS=()
 if [[ "$(uname)" == "Darwin" ]]; then
+  # std::is_base_of_v is used without <type_traits>; libc++ does not pull it
+  # in through other headers
+  export CXXFLAGS="${CXXFLAGS} -include type_traits"
   EXTRA_ARGS+=(-DCMAKE_FIND_FRAMEWORK=LAST
                -DEXPAT_INCLUDE_DIR="${PREFIX}/include"
                -DEXPAT_LIBRARY="${PREFIX}/lib/libexpat${SHLIB_EXT}")
