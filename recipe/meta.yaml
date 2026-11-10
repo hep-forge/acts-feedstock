@@ -56,11 +56,12 @@ requirements:
     # transitively.
     - libboost-devel
     - eigen
-    - root {{ root }}.*
+    - root_base {{ root }}.* cxx{{ root_cxx_standard }}*
+    - python
     - dd4hep>=1.11 root{{ root_tag }}
     - nlohmann_json
   run:
-    - root {{ root }}.*
+    - {{ pin_compatible('root_base', exact=True) }}
     - dd4hep>=1.11 root{{ root_tag }}
     - nlohmann_json
 
